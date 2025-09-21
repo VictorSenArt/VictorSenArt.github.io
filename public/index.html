@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Victor SenArt - Gamedev & Pixel Artist</title>
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        /* CSS Variables for theme colors */
+        :root {
+            --primary-color: #952930;
+            --primary-gradient: linear-gradient(90deg, #952930, #9d3a40);
+            --text-color: #333333;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-color: #e9ecef;
+            --header-color: #dfbfc1;
+        }
+        
+        /* Dark theme variables */
+        [data-theme="dark"] {
+            --primary-color: #952930;
+            --primary-gradient: linear-gradient(90deg, #952930, #9d3a40);
+            --text-color: #e9ecef;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --border-color: #2d2d2d;
+            --header-color: #dfbfc1;
+        }
+        
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 5px;
+        }
+        
+        /* Header and navigation */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--border-color);
+            height: 70px;
+        }
+        
+        [data-theme="dark"] .header {
+            background-color: rgba(18, 18, 18, 0.9);
+        }
+        
+        /* Logo styles */
+        .logo {
+            height: 50px;
+            max-height: 100%;
+            width: auto;
+            object-fit: contain;
+        }
+        
+        /* Navigation links */
+        .nav-link {
+            position: relative;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Button styles */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(149, 41, 48, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(149, 41, 48, 0.4);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+        
+        /* Card styles */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+        
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* Gallery item */
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .gallery-item img {
+            transition: transform 0.5s ease;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+            display: flex;
+            align-items: flex-end;
+            padding: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        
+        /* Lightbox styles */
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .lightbox.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        
+        .lightbox.active .lightbox-content {
+            transform: scale(1);
+        }
+        
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .lightbox-close:hover {
+            color: var(--primary-color);
+        }
+        
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .lightbox-prev {
+            left: -40px;
+        }
+        
+        .lightbox-next {
+            right: -40px;
+        }
+        
+        .lightbox-nav:hover {
+            color: var(--primary-color);
+        }
+        
+        /* Theme toggle */
+        .theme-toggle {
+            width: 60px;
+            height: 30px;
+            background-color: var(--border-color);
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .theme-toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        [data-theme="dark"] .theme-toggle {
+            background-color: #4a4a4a;
+        }
+        
+        [data-theme="dark"] .theme-toggle-slider {
+            transform: translateX(30px);
+            background-color: var(--primary-color);
+        }
+        
+        [data-theme="dark"] .theme-toggle-slider i {
+            color: white;
+        }
+        
+        /* Mobile menu */
+        .mobile-menu-toggle {
+            display: none;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100%;
+            background-color: var(--card-bg);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 200;
+            transition: right 0.3s ease;
+            padding: 2rem;
+            border-left: 1px solid var(--border-color);
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+        
+        /* Animation classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .fade-in.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* BEM utility classes */
+        .section__title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--header-color);
+        }
+        
+        .section__subtitle {
+            font-size: 1.25rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 3rem;
+        }
+        
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-primary {
+            background-color: rgba(149, 41, 48, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .badge-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+        
+        /* Tag styles */
+        .tag {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background-color: var(--border-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        
+        .tag:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* Hero section */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(149, 41, 48, 0.05) 0%, rgba(223, 191, 193, 0.1) 100%);
+        }
+        
+        .hero__bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        .hero__content {
+            text-align: center;
+            z-index: 1;
+            max-width: 800px;
+            padding: 0 1rem;
+        }
+        
+        .hero__title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+        
+        .hero__subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        .hero__actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Contact section */
+        .contact__info {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .contact__item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .contact__icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        
+        .contact__text h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--header-color);
+        }
+        
+        .contact__text p {
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .desktop-menu {
+                display: none;
+            }
+            
+            .section__title {
+                font-size: 2rem;
+            }
+            
+            .hero__title {
+                font-size: 2.5rem;
+            }
+            
+            .hero__subtitle {
+                font-size: 1.25rem;
+            }
+            
+            .header {
+                height: 60px;
+            }
+            
+            .logo {
+                height: 40px;
+            }
+        }
+        
+        /* Input styles */
+        input, select, textarea {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(149, 41, 48, 0.1);
+        }
+        
+        /* Social icon styles */
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(149, 41, 48, 0.3);
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Header with Navigation -->
+    <header class="header py-4 px-6">
+        <div class="container mx-auto h-full flex justify-between items-center">
+            <a href="#home" class="flex items-center h-full">
+                <img src="https://i.imgur.com/fgeOBM7.png" alt="Victor SenArt Logo" class="logo">
+            </a>
+            
+            <!-- Desktop Navigation -->
+            <nav class="desktop-menu hidden md:flex space-x-8">
+                <a href="#home" class="nav-link">HOME</a>
+                <a href="#free-material" class="nav-link">FREE MATERIAL</a>
+                <a href="#commission" class="nav-link">COMMISSION</a>
+                <a href="#work" class="nav-link">WORK</a>
+                <a href="#about" class="nav-link">ABOUT</a>
+                <a href="#contact" class="nav-link">CONTACT</a>
+                <a href="#link" class="nav-link">LINK</a>
+                <a href="https://example.com" target="_blank" class="nav-link">LINK TREE</a>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Theme Toggle -->
+                <div class="theme-toggle" id="theme-toggle">
+                    <div class="theme-toggle-slider">
+                        <i class="fas fa-moon text-xs"></i>
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Toggle -->
+                <div class="mobile-menu-toggle" id="mobile-menu-toggle">
+                    <i class="fas fa-bars text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-close" id="mobile-menu-close">
+            <i class="fas fa-times"></i>
+        </div>
+        <nav class="flex flex-col space-y-4 mt-8">
+            <a href="#home" class="nav-link text-lg">HOME</a>
+            <a href="#free-material" class="nav-link text-lg">FREE MATERIAL</a>
+            <a href="#commission" class="nav-link text-lg">COMMISSION</a>
+            <a href="#work" class="nav-link text-lg">WORK</a>
+            <a href="#about" class="nav-link text-lg">ABOUT</a>
+            <a href="#contact" class="nav-link text-lg">CONTACT</a>
+            <a href="#link" class="nav-link text-lg">LINK</a>
+            <a href="https://example.com" target="_blank" class="nav-link text-lg">LINK TREE</a>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="hero__bg">
+                <div class="absolute inset-0 bg-gradient-to-br from-red-50 to-pink-100 opacity-30"></div>
+                <div class="absolute top-20 left-10 w-64 h-64 rounded-full bg-red-200 opacity-20 blur-3xl"></div>
+                <div class="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-pink-200 opacity-20 blur-3xl"></div>
+            </div>
+            
+            <div class="hero__content fade-in">
+                <h1 class="hero__title">Victor SenArt</h1>
+                <p class="hero__subtitle">Gamedev & Pixel Artist creating unique digital experiences</p>
+                <div class="hero__actions">
+                    <a href="#free-material" class="btn btn-primary">Explore Free Materials</a>
+                    <a href="#commission" class="btn btn-outline">Commission Work</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Free Material Section -->
+        <section id="free-material" class="py-20 px-6">
+            <div class="container mx-auto">
+                <h2 class="section__title fade-in text-center">Free Material</h2>
+                <p class="section__subtitle fade-in text-center">High-quality assets for your game development projects</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+                    <!-- Material Card 1 -->
+                    <div class="card fade-in">
+                        <img src="https://picsum.photos/seed/pixelart1/400/250.jpg" alt="Pixel Art Pack" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold">Pixel Art Pack</h3>
+                                <span class="badge badge-success">Free</span>
+                            </div>
+                            <p class="mb-4 opacity-80">A collection of pixel art characters, items, and environments for retro-style games.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tag">Characters</span>
+                                <span class="tag">Items</span>
+                                <span class="tag">Environments</span>
+                            </div>
+                            <a href="#" class="btn btn-outline w-full">Download</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Material Card 2 -->
+                    <div class="card fade-in">
+                        <img src="https://picsum.photos/seed/soundfx/400/250.jpg" alt="Sound Effects" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold">Sound Effects</h3>
+                                <span class="badge badge-success">Free</span>
+                            </div>
+                            <p class="mb-4 opacity-80">Retro-style sound effects perfect for 8-bit and 16-bit game projects.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tag">8-bit</span>
+                                <span class="tag">16-bit</span>
+                                <span class="tag">SFX</span>
+                            </div>
+                            <a href="#" class="btn btn-outline w-full">Download</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Material Card 3 -->
+                    <div class="card fade-in">
+                        <img src="https://picsum.photos/seed/palette/400/250.jpg" alt="Color Palettes" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold">Color Palettes</h3>
+                                <span class="badge badge-success">Free</span>
+                            </div>
+                            <p class="mb-4 opacity-80">Curated color palettes inspired by classic games and modern aesthetics.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tag">Retro</span>
+                                <span class="tag">Modern</span>
+                                <span class="tag">Curated</span>
+                            </div>
+                            <a href="#" class="btn btn-outline w-full">Download</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12 text-center fade-in">
+                    <p class="mb-4 opacity-80">All free materials require attribution. Please credit "Victor SenArt" when using.</p>
+                    <a href="#" class="btn btn-outline">View Usage Terms</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Commission Section -->
+        <section id="commission" class="py-20 px-6">
+            <div class="container mx-auto">
+                <h2 class="section__title fade-in text-center">Commission Work</h2>
+                <p class="section__subtitle fade-in text-center">Custom pixel art and game assets tailored to your project</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+                    <!-- Gallery Item 1 -->
+                    <div class="gallery-item fade-in" data-index="0">
+                        <img src="https://picsum.photos/seed/character/400/300.jpg" alt="Pixel Art Commission 1" class="w-full h-64 object-cover">
+                        <div class="gallery-overlay">
+                            <div>
+                                <h3 class="text-white font-bold text-lg">Character Design</h3>
+                                <p class="text-white text-sm opacity-80">Custom pixel character</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gallery Item 2 -->
+                    <div class="gallery-item fade-in" data-index="1">
+                        <img src="https://picsum.photos/seed/environment/400/300.jpg" alt="Pixel Art Commission 2" class="w-full h-64 object-cover">
+                        <div class="gallery-overlay">
+                            <div>
+                                <h3 class="text-white font-bold text-lg">Environment Art</h3>
+                                <p class="text-white text-sm opacity-80">Pixel game backgrounds</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gallery Item 3 -->
+                    <div class="gallery-item fade-in" data-index="2">
+                        <img src="https://picsum.photos/seed/ui/400/300.jpg" alt="Pixel Art Commission 3" class="w-full h-64 object-cover">
+                        <div class="gallery-overlay">
+                            <div>
+                                <h3 class="text-white font-bold text-lg">UI Elements</h3>
+                                <p class="text-white text-sm opacity-80">Game interface design</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gallery Item 4 -->
+                    <div class="gallery-item fade-in" data-index="3">
+                        <img src="https://picsum.photos/seed/items/400/300.jpg" alt="Pixel Art Commission 4" class="w-full h-64 object-cover">
+                        <div class="gallery-overlay">
+                            <div>
+                                <h3 class="text-white font-bold text-lg">Item Icons</h3>
+                                <p class="text-white text-sm opacity-80">Pixel item collection</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gallery Item 5 -->
+                    <div class="gallery-item fade-in" data-index="4">
+                        <img src="https://picsum.photos/seed/animation/400/300.jpg" alt="Pixel Art Commission 5" class="w-full h-64 object-cover">
+                        <div class="gallery-overlay">
+                            <div>
+                                <h3 class="text-white font-bold text-lg">Animation</h3>
+                                <p class="text-white text-sm opacity-80">Pixel character animation</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gallery Item 6 -->
+                    <div class="gallery-item fade-in" data-index="5">
+                        <img src="https://picsum.photos/seed/tileset/400/300.jpg" alt="Pixel Art Commission 6" class="w-full h-64 object-cover">
+                        <div class="gallery-overlay">
+                            <div>
+                                <h3 class="text-white font-bold text-lg">Tilesets</h3>
+                                <p class="text-white text-sm opacity-80">Game level tilesets</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12 text-center fade-in">
+                    <a href="#contact" class="btn btn-primary">Request a Commission</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Work Section -->
+        <section id="work" class="py-20 px-6">
+            <div class="container mx-auto">
+                <h2 class="section__title fade-in text-center">Work</h2>
+                <p class="section__subtitle fade-in text-center">Featured projects and collaborations</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mt-12">
+                    <!-- Project 1 -->
+                    <div class="card fade-in">
+                        <img src="https://picsum.photos/seed/retroadventure/600/400.jpg" alt="Project 1" class="w-full h-64 object-cover">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold">Retro Adventure</h3>
+                                <span class="badge badge-primary">Featured</span>
+                            </div>
+                            <p class="mb-4 opacity-80">A pixel art adventure game with exploration and puzzle elements.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tag">Pixel Art</span>
+                                <span class="tag">Game Design</span>
+                                <span class="tag">Adventure</span>
+                            </div>
+                            <a href="#" class="btn btn-outline">View Project</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 2 -->
+                    <div class="card fade-in">
+                        <img src="https://picsum.photos/seed/spacedefender/600/400.jpg" alt="Project 2" class="w-full h-64 object-cover">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold">Space Defender</h3>
+                                <span class="badge badge-primary">Featured</span>
+                            </div>
+                            <p class="mb-4 opacity-80">A classic space shooter with modern mechanics and retro aesthetics.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tag">Animation</span>
+                                <span class="tag">UI Design</span>
+                                <span class="tag">Shooter</span>
+                            </div>
+                            <a href="#" class="btn btn-outline">View Project</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- About Section -->
+        <section id="about" class="py-20 px-6">
+            <div class="container mx-auto">
+                <h2 class="section__title fade-in text-center">About</h2>
+                <p class="section__subtitle fade-in text-center">Get to know the artist behind the pixels</p>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-12">
+                    <div class="fade-in">
+                        <img src="https://picsum.photos/seed/victorsenart/600/600.jpg" alt="Victor SenArt" class="w-full rounded-2xl shadow-lg">
+                    </div>
+                    
+                    <div class="fade-in">
+                        <h3 class="text-2xl font-bold mb-6">Victor SenArt</h3>
+                        
+                        <div class="space-y-4">
+                            <p>
+                                I discovered RPG Maker thanks to a magazine with a CD-ROM at the bus station during a trip to the second city on the route, in issue number 38 of Top Games Special published by Digerati. However, I couldn't use the software on my old PC, both RPG Maker 2000 and RPG Maker XP, so I just had fun with the 70 games that came on the CD-ROM.
+                            </p>
+                            
+                            <p>
+                                After many years, with a better PC and having forgotten about the Magazine/RPG Maker, a friend showed me Chars XP, a Character generator with RTP XP style. While looking for more about the subject, I discovered Vila Makers, a Brazilian community that had some utilities and resources available on its downloads page to assist in RPG Maker creations; I just peeked around and downloaded stuff. 👀
+                            </p>
+                            
+                            <p>
+                                I only entered the "RPG Maker" environment in 2010. I was known as "Vash" (yes, the protagonist of TRIGUN) in the Brazilian Makers Communities at the beginning of the same year and even created a blog (Vash Maker) to publish my works. From the communities, I witnessed them fall and rise again, fall again even after resurfacing with different names, and even the friends and companions I acquired over the years disappeared.
+                            </p>
+                            
+                            <p>
+                                Initially, it became a hobby because, analyzing everything I did, from projects that didn't go forward (lost with the hard drive), to those of various teams I participated in that also didn't go forward, to series or package projects that didn't quite work out, I always did it all for fun without intending to profit or pursue a career in game development.
+                            </p>
+                            
+                            <p>
+                                But even though I didn't intend to professionalize, I managed to learn and improve my skills in the communities I frequented, the ones I remember are:
+                            </p>
+                            
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>Santuário RPG Maker (later became Arena Livre)</li>
+                                <li>Mundo RPG Maker</li>
+                                <li>Condado Braveheart (formerly Vila Makers)</li>
+                                <li>Grandes Makers</li>
+                                <li>Reino RPG (later became Red Potion)</li>
+                                <li>Dungeon Makers</li>
+                                <li>Centro RPG Maker</li>
+                            </ul>
+                            
+                            <p>
+                                The last one was the one I felt most attached to because of the time I spent there.
+                            </p>
+                            
+                            <p>
+                                So, I decided to return to the scene with my Pixel Art and I want to release new materials and maybe update the old ones improving their art and start over with new projects because I still like this "environment," even though it seems very stagnant.
+                            </p>
+                        </div>
+                        
+                        <div class="flex space-x-4 mt-8">
+                            <a href="#" class="social-icon">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-icon">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-icon">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="#" class="social-icon">
+                                <i class="fab fa-artstation"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 px-6">
+            <div class="container mx-auto">
+                <h2 class="section__title fade-in text-center">Contact</h2>
+                <p class="section__subtitle fade-in text-center">Get in touch for commissions or collaborations</p>
+                
+                <div class="max-w-3xl mx-auto mt-12">
+                    <div class="contact__info fade-in">
+                        <div class="contact__item">
+                            <div class="contact__icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact__text">
+                                <h3>Email</h3>
+                                <p>contact@victorsenart.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact__item">
+                            <div class="contact__icon">
+                                <i class="fab fa-discord"></i>
+                            </div>
+                            <div class="contact__text">
+                                <h3>Discord</h3>
+                                <p>VictorSenArt#1234</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact__item">
+                            <div class="contact__icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="contact__text">
+                                <h3>Response Time</h3>
+                                <p>Usually within 24-48 hours</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact__item">
+                            <div class="contact__icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="contact__text">
+                                <h3>Commission Process</h3>
+                                <p>Submit your request with details → Receive a quote and timeline → Approve the concept sketch → Receive progress updates → Get the final assets</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-12 text-center fade-in">
+                        <a href="mailto:contact@victorsenart.com" class="btn btn-primary">Send Email</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Link Section -->
+        <section id="link" class="py-20 px-6">
+            <div class="container mx-auto">
+                <h2 class="section__title fade-in text-center">Links</h2>
+                <p class="section__subtitle fade-in text-center">Find me on other platforms</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+                    <a href="#" class="card p-6 flex flex-col items-center text-center hover:shadow-lg transition fade-in">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-r from-red-800 to-red-500 flex items-center justify-center text-white text-2xl mb-4">
+                            <i class="fab fa-itch-io"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Itch.io</h3>
+                        <p class="opacity-80">Play my games</p>
+                    </a>
+                    
+                    <a href="#" class="card p-6 flex flex-col items-center text-center hover:shadow-lg transition fade-in">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-r from-red-800 to-red-500 flex items-center justify-center text-white text-2xl mb-4">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">YouTube</h3>
+                        <p class="opacity-80">Tutorials and devlogs</p>
+                    </a>
+                    
+                    <a href="#" class="card p-6 flex flex-col items-center text-center hover:shadow-lg transition fade-in">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-r from-red-800 to-red-500 flex items-center justify-center text-white text-2xl mb-4">
+                            <i class="fab fa-patreon"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Patreon</h3>
+                        <p class="opacity-80">Support my work</p>
+                    </a>
+                    
+                    <a href="#" class="card p-6 flex flex-col items-center text-center hover:shadow-lg transition fade-in">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-r from-red-800 to-red-500 flex items-center justify-center text-white text-2xl mb-4">
+                            <i class="fab fa-ko-fi"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Ko-fi</h3>
+                        <p class="opacity-80">Buy me a coffee</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="py-8 px-6 border-t border-border-color">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <img src="https://i.imgur.com/fgeOBM7.png" alt="Victor SenArt Logo" class="h-10">
+                </div>
+                
+                <div class="flex space-x-6 mb-4 md:mb-0">
+                    <a href="#" class="hover:text-primary-color transition">Terms of Use</a>
+                    <a href="#" class="hover:text-primary-color transition">Privacy Policy</a>
+                    <a href="#" class="hover:text-primary-color transition">Sitemap</a>
+                </div>
+                
+                <div class="text-sm opacity-80">
+                    &copy; <span id="current-year"></span> Victor SenArt. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-content">
+            <div class="lightbox-close" id="lightbox-close">
+                <i class="fas fa-times"></i>
+            </div>
+            <div class="lightbox-nav lightbox-prev" id="lightbox-prev">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            <img src="" alt="" id="lightbox-image">
+            <div class="lightbox-nav lightbox-next" id="lightbox-next">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+		// Site title constant
+		const SITE_TITLE = "Victor SenArt";
+
+		// Set current year in footer
+		document.getElementById('current-year').textContent = new Date().getFullYear();
+
+		// Theme toggle functionality
+		const themeToggle = document.getElementById('theme-toggle');
+		const body = document.body;
+
+		// Função para salvar a preferência de tema no localStorage
+		function saveThemePreference(theme) {
+			localStorage.setItem('theme', theme);
+		}
+
+		// Função para carregar a preferência de tema do localStorage
+		function loadThemePreference() {
+			const savedTheme = localStorage.getItem('theme');
+			if (savedTheme) {
+				body.setAttribute('data-theme', savedTheme);
+				return savedTheme;
+			}
+			// Retorna o tema atual se não houver preferência salva
+			return body.getAttribute('data-theme') || 'dark';
+		}
+
+		// Inicializar o tema com base na preferência salva
+		const currentTheme = loadThemePreference();
+
+		// Initialize theme toggle icon based on current theme
+		function initializeThemeToggle() {
+			const icon = themeToggle.querySelector('i');
+			if (currentTheme === 'dark') {
+				icon.className = 'fas fa-moon text-xs';
+			} else {
+				icon.className = 'fas fa-sun text-xs';
+			}
+		}
+
+		// Initialize on page load
+		initializeThemeToggle();
+
+		themeToggle.addEventListener('click', () => {
+			const icon = themeToggle.querySelector('i');
+			
+			if (body.getAttribute('data-theme') === 'light') {
+				// Switch to dark theme
+				body.setAttribute('data-theme', 'dark');
+				icon.className = 'fas fa-moon text-xs';
+				saveThemePreference('dark'); // Salvar preferência
+			} else {
+				// Switch to light theme
+				body.setAttribute('data-theme', 'light');
+				icon.className = 'fas fa-sun text-xs';
+				saveThemePreference('light'); // Salvar preferência
+			}
+		});
+        
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+        
+        mobileMenuToggle.addEventListener('click', () => {
+            mobileMenu.classList.add('active');
+        });
+        
+        mobileMenuClose.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+        });
+        
+        // Close mobile menu when clicking on a link
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+            });
+        });
+        
+        // Fade in animation on scroll
+        const fadeElements = document.querySelectorAll('.fade-in');
+        
+        const fadeInOnScroll = () => {
+            fadeElements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementBottom = element.getBoundingClientRect().bottom;
+                
+                if (elementTop < window.innerHeight && elementBottom > 0) {
+                    element.classList.add('active');
+                }
+            });
+        };
+        
+        window.addEventListener('scroll', fadeInOnScroll);
+        fadeInOnScroll(); // Run once on load
+        
+        // Lightbox functionality
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const lightboxClose = document.getElementById('lightbox-close');
+        const lightboxPrev = document.getElementById('lightbox-prev');
+        const lightboxNext = document.getElementById('lightbox-next');
+        
+        let currentImageIndex = 0;
+        const galleryImages = Array.from(galleryItems).map(item => item.querySelector('img').src);
+        
+        galleryItems.forEach((item, index) => {
+            item.addEventListener('click', () => {
+                currentImageIndex = index;
+                openLightbox();
+            });
+        });
+        
+        const openLightbox = () => {
+            lightboxImage.src = galleryImages[currentImageIndex];
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+        
+        const closeLightbox = () => {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+        
+        lightboxClose.addEventListener('click', closeLightbox);
+        
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+        
+        // Lightbox navigation
+        lightboxPrev.addEventListener('click', () => {
+            currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+            lightboxImage.src = galleryImages[currentImageIndex];
+        });
+        
+        lightboxNext.addEventListener('click', () => {
+            currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+            lightboxImage.src = galleryImages[currentImageIndex];
+        });
+        
+        // Keyboard navigation for lightbox
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            
+            if (e.key === 'Escape') {
+                closeLightbox();
+            } else if (e.key === 'ArrowLeft') {
+                lightboxPrev.click();
+            } else if (e.key === 'ArrowRight') {
+                lightboxNext.click();
+            }
+        });
+        
+        // Touch/swipe support for lightbox
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        lightbox.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        lightbox.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        
+        const handleSwipe = () => {
+            if (touchEndX < touchStartX - 50) {
+                // Swipe left, go to next image
+                lightboxNext.click();
+            }
+            
+            if (touchEndX > touchStartX + 50) {
+                // Swipe right, go to previous image
+                lightboxPrev.click();
+            }
+        };
+    </script>
+</body>
+</html>
